@@ -63,12 +63,17 @@
             letter-spacing: -0.3px; /* 精细调整字符间距 */
             line-height: 1.05; /* 紧凑的行高，贴合参考图 */
         }
+
+        /* 关键：控制两行排版 + 避免在 max-w-5xl 下被撑到换行 */
         .title-main {
-            font-size: clamp(2.5rem, 5vw, 4rem); /* 响应式字号 */
+            font-size: clamp(2.1rem, 4.2vw, 3.2rem); /* 降低最大字号，避免第一行折行 */
         }
         .title-sub {
-            font-size: clamp(2rem, 4vw, 3.5rem); /* 副标题稍小 */
+            font-size: clamp(1.6rem, 3.2vw, 2.6rem);
             font-weight: 300; /* 更轻的字重，突出层次感 */
+        }
+        .title-line1 {
+            white-space: nowrap; /* 强制第一行不换行 -> 始终两行 */
         }
         
         /* AMASS 风格的引用代码块 */
@@ -105,11 +110,10 @@
     <section class="bg-white">
         <!-- 标题区 (AMASS 参考图布局) -->
         <div class="max-w-5xl mx-auto py-12 px-8">
-            <!-- 主标题 -->
-            <h1 class="paper-title title-main mb-4 text-center">
-                Amplitude-Preserving Complex<br>
-                <span class="block mb-1">Networks</span>
-                <span class="title-sub">for Long-Term Human Motion Prediction</span>
+            <!-- 主标题（严格两行） -->
+            <h1 class="paper-title mb-4 text-center">
+                <span class="title-main title-line1 block">Amplitude-Preserving Complex Networks</span>
+                <span class="title-sub block">for Long-Term Human Motion Prediction</span>
             </h1>
             
             <!-- 作者 -->
@@ -148,13 +152,6 @@
                     style="max-height: 400px; object-fit: contain;"
                 >
             </div>
-            
-            <p class="text-gray-800 leading-relaxed mb-8 text-center">
-                本文提出了一种基于深度学习的人体运动预测方法，通过结合时空卷积神经网络和注意力机制，实现了对人体未来动作序列的精确预测。
-                我们的方法在 Human3.6M 和 AMASS 数据集上取得了 SOTA 性能，相比现有方法在预测精度上提升了 15%。
-                实验结果表明，该方法能够有效捕捉人体运动的长期依赖关系，并在复杂场景下保持良好的预测稳定性。
-                本研究为智能监控、人机交互、虚拟现实等领域提供了重要的技术支撑。
-            </p>
         </div>
 
         <!-- Abstract 区块 (标题放大+居中) -->
@@ -179,7 +176,7 @@
                 <!-- Video 播放器 (AMASS 风格) -->
                 <div class="relative w-full aspect-video bg-black/10 flex items-center justify-center">
                     <img 
-                        src="https://via.placeholder.com/1280x720/eeeeee/666666?text=Human+Motion+Prediction+Demo" 
+                        src="../video/presentation.mp4" 
                         alt="Video thumbnail" 
                         class="w-full h-full object-cover opacity-80"
                     >
