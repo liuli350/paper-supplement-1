@@ -55,6 +55,21 @@
             background-color: white;
             border-bottom: 1px solid #e5e7eb;
         }
+
+        .paper-title {
+            font-family: 'Georgia', 'Times New Roman', Times, serif;
+            font-weight: 400; /* 匹配参考图的常规字重 */
+            color: #2D3748; /* 深灰蓝色，匹配参考图的文字颜色 */
+            letter-spacing: -0.3px; /* 精细调整字符间距 */
+            line-height: 1.05; /* 紧凑的行高，贴合参考图 */
+        }
+        .title-main {
+            font-size: clamp(2.5rem, 5vw, 4rem); /* 响应式字号 */
+        }
+        .title-sub {
+            font-size: clamp(2rem, 4vw, 3.5rem); /* 副标题稍小 */
+            font-weight: 300; /* 更轻的字重，突出层次感 */
+        }
         
         /* AMASS 风格的引用代码块 */
         pre {
@@ -75,7 +90,7 @@
     <!-- 导航栏 (AMASS 极简风格) -->
     <nav id="navbar" class="px-8">
         <div class="max-w-5xl mx-auto w-full flex justify-between items-center">
-            <div class="text-xl font-medium text-primary">HMP Research</div>
+            <div class="text-xl font-medium text-primary">APCNet</div>
             <div class="flex space-x-8">
                 <a href="index.html" class="nav-link text-primary hover:text-accent transition-colors">Home</a>
                 <a href="downloads.html" class="nav-link text-gray-700 hover:text-accent transition-colors">Downloads</a>
@@ -90,8 +105,10 @@
         <!-- 标题区 (AMASS 参考图布局) -->
         <div class="max-w-5xl mx-auto py-12 px-8">
             <!-- 主标题 -->
-            <h1 class="text-5xl md:text-6xl font-light text-gray-700 mb-4 text-center">
-                Human Motion Prediction Research
+            <h1 class="paper-title title-main mb-4 text-center">
+                Amplitude-Preserving Complex<br>
+                <span class="block mb-1">Networks</span>
+                <span class="title-sub">for Long-Term Human Motion Prediction</span>
             </h1>
             
             <!-- 作者 -->
@@ -124,7 +141,7 @@
         <div class="max-w-5xl mx-auto mb-16 px-8">
             <div class="bg-gray-50 border border-gray-200 rounded-sm p-4 mb-8">
                 <img 
-                    src="https://ai-public.mastergo.com/ai/img_res/ef8c0d7deb30c9f3a5786a690d147074.jpg" 
+                    src="./image.png" 
                     alt="Human Motion Prediction Visualization" 
                     class="w-full h-auto object-contain"
                     style="max-height: 400px; object-fit: contain;"
