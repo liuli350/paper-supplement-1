@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMP - 人体运动预测</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></script>
+    <script>
+        tailwind.config={
+            theme:{
+                extend:{
+                    colors:{
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa'
+                    },
+                    borderRadius:{
+                        'none':'0px',
+                        'sm':'2px',
+                        DEFAULT:'4px',
+                        'md':'8px',
+                        'lg':'12px',
+                        'xl':'16px',
+                        '2xl':'20px',
+                        '3xl':'24px',
+                        'full':'9999px',
+                        'button':'4px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            min-height: 1024px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .navbar-scrolled {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        .section {
+            min-height: 1024px;
+            display: none;
+        }
+        .active-section {
+            display: block;
+        }
+        .hero-bg {
+            background-image: url('https://ai-public.mastergo.com/ai/img_res/ef8c0d7deb30c9f3a5786a690d147074.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 2rem;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 20px;
+            bottom: -10px;
+            width: 2px;
+            background-color: #dbeafe;
+        }
+        .timeline-item:last-child:after {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 固定导航栏 -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md py-4 px-8 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="text-2xl font-['Pacifico'] text-primary">logo</div>
+            </div>
+            <div class="flex space-x-8">
+                <button onclick="showSection('home')" class="nav-link text-gray-700 hover:text-primary font-medium transition-colors">Home</button>
+                <button onclick="showSection('news')" class="nav-link text-gray-700 hover:text-primary font-medium transition-colors">News</button>
+                <button onclick="showSection('downloads')" class="nav-link text-gray-700 hover:text-primary font-medium transition-colors">Downloads</button>
+                <button onclick="showSection('license')" class="nav-link text-gray-700 hover:text-primary font-medium transition-colors">License</button>
+                <button onclick="showSection('extra')" class="nav-link text-gray-700 hover:text-primary font-medium transition-colors">Extra</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home 页面 -->
+    <section id="home" class="section active-section pt-24 px-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Hero 区域 -->
+            <div class="hero-bg rounded-2xl p-12 mb-16 text-white relative overflow-hidden">
+                <!-- 新增：半透明遮罩层 -->
+                <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 z-0"></div>
+                
+                <div class="max-w-3xl relative z-10">
+                    <h1 class="text-5xl font-bold mb-6 text-shadow-lg" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Human Motion Prediction Research</h1>
+                    <p class="text-xl mb-8 opacity-95" style="text-shadow: 0 1px 3px rgba(0,0,0,0.4);">基于深度学习的人体运动预测技术研究</p>
+                    <div class="flex space-x-4">
+                        <button class="bg-primary/90 hover:bg-secondary text-white px-6 py-3 !rounded-button whitespace-nowrap font-medium transition-colors shadow-lg">
+                            <i class="fas fa-file-pdf mr-2"></i> 论文预览
+                        </button>
+                        <button class="bg-white/95 text-primary hover:bg-white px-6 py-3 !rounded-button whitespace-nowrap font-medium transition-colors shadow-lg">
+                            <i class="fas fa-code mr-2"></i> 查看代码
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 论文信息卡片 -->
+            <div class="grid md:grid-cols-2 gap-8 mb-16">
+                <div class="bg-white rounded-xl p-8 shadow-lg card-hover">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">论文信息</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-sm font-medium text-gray-500">会议</span>
+                            <p class="text-lg text-gray-800">CVPR 2024</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-gray-500">发表时间</span>
+                            <p class="text-lg text-gray-800">2024年6月</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-gray-500">作者</span>
+                            <p class="text-lg text-gray-800">张伟，李娜，王强，陈美华</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-8 shadow-lg card-hover">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">引用信息</h2>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <code class="text-sm text-gray-700">
+                            @article{zhang2024human,<br>
+                            &nbsp;&nbsp;title={Human Motion Prediction Using Deep Learning},<br>
+                            &nbsp;&nbsp;author={Zhang, Wei and Li, Na and Wang, Qiang and Chen, Meihua},<br>
+                            &nbsp;&nbsp;journal={CVPR},<br>
+                            &nbsp;&nbsp;year={2024}<br>
+                            }
+                        </code>
+                    </div>
+                    <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 !rounded-button whitespace-nowrap text-sm transition-colors">
+                        <i class="fas fa-copy mr-2"></i> 复制引用
+                    </button>
+                </div>
+            </div>
+            <!-- 摘要区域 -->
+            <div class="bg-white rounded-xl p-8 shadow-lg mb-16">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">论文摘要</h2>
+                <p class="text-gray-700 leading-relaxed text-lg">
+                    本文提出了一种基于深度学习的人体运动预测方法，通过结合时空卷积神经网络和注意力机制，
+                    实现了对人体未来动作序列的精确预测。我们的方法在 Human3.6M 和 AMASS 数据集上取得了
+                    SOTA 性能，相比现有方法在预测精度上提升了 15%。实验结果表明，该方法能够有效捕捉人体
+                    运动的长期依赖关系，并在复杂场景下保持良好的预测稳定性。本研究为智能监控、人机交互、
+                    虚拟现实等领域提供了重要的技术支撑。
+                </p>
+            </div>
+
+            <!-- 资源链接卡片 -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 card-hover">
+                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-file-pdf text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">论文文档</h3>
+                    <p class="text-gray-600 mb-4">PDF 格式的完整论文文档</p>
+                    <a href="#" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                        下载 <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100 card-hover">
+                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-video text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">演示视频</h3>
+                    <p class="text-gray-600 mb-4">算法演示和技术讲解视频</p>
+                    <a href="#" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                        观看 <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100 card-hover">
+                    <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-code text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">源代码</h3>
+                    <p class="text-gray-600 mb-4">PyTorch 实现的完整源代码</p>
+                    <a href="#" class="inline-flex items-center text-primary hover:text-secondary font-medium">
+                        获取 <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News 页面 -->
+    <section id="news" class="section pt-24 px-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">最新动态</h1>
+            
+            <div class="space-y-8">
+                <div class="timeline-item">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">模型更新 v2.1</h3>
+                    <p class="text-gray-600 mb-2">2024年3月15日</p>
+                    <p class="text-gray-700">
+                        发布了新的预训练模型，优化了网络结构，在 Human3.6M 数据集上的预测精度提升了 8%，
+                        同时减少了计算复杂度，提高了推理速度。
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">论文被 CVPR 2024 接收</h3>
+                    <p class="text-gray-600 mb-2">2024年2月28日</p>
+                    <p class="text-gray-700">
+                        我们的论文 "Human Motion Prediction Using Deep Learning" 已被 CVPR 2024 正式接收，
+                        这是对我们研究工作的认可，我们将继续努力推进相关技术的发展。
+                    </p>
+                </div>
+
+                <div class="timeline-item">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">开源代码发布</h3>
+                    <p class="text-gray-600 mb-2">2024年2月1日</p>
+                    <p class="text-gray-700">
+                        完整的 PyTorch 实现代码已发布到 GitHub，包含详细的文档和使用示例，
+                        欢迎研究人员和开发者使用和贡献。
+                    </p>
+                </div>
+
+                <div class="timeline-item">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">数据集更新</h3>
+                    <p class="text-gray-600 mb-2">2024年1月15日</p>
+                    <p class="text-gray-700">
+                        扩展了训练数据集，新增了 5000 个人体运动序列，涵盖了更多复杂的动作模式，
+                        进一步提升了模型的泛化能力。
+                    </p>
+                </div>
+
+                <div class="timeline-item">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">技术报告发布</h3>
+                    <p class="text-gray-600 mb-2">2023年12月20日</p>
+                    <p class="text-gray-700">
+                        发布了详细的技术报告，深入介绍了算法原理、实现细节和实验结果，
+                        为相关研究提供了全面的参考。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Downloads 页面 -->
+    <section id="downloads" class="section pt-24 px-8">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">下载中心</h1>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-code text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">源代码</h3>
+                    <p class="text-gray-600 mb-4">完整的 PyTorch 实现代码</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">v2.1.0</span>
+                        <span class="text-sm text-gray-500">125 MB</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-secondary text-white py-2 !rounded-button whitespace-nowrap transition-colors">
+                        <i class="fas fa-download mr-2"></i> 下载
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-brain text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">预训练模型</h3>
+                    <p class="text-gray-600 mb-4">在 Human3.6M 上训练的模型</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">v2.1</span>
+                        <span class="text-sm text-gray-500">2.3 GB</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-secondary text-white py-2 !rounded-button whitespace-nowrap transition-colors">
+                        <i class="fas fa-download mr-2"></i> 下载
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-file-pdf text-red-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">论文文档</h3>
+                    <p class="text-gray-600 mb-4">CVPR 2024 论文 PDF</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Final Version</span>
+                        <span class="text-sm text-gray-500">2.1 MB</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-secondary text-white py-2 !rounded-button whitespace-nowrap transition-colors">
+                        <i class="fas fa-download mr-2"></i> 下载
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-database text-yellow-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">数据集</h3>
+                    <p class="text-gray-600 mb-4">处理后的运动数据集</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">v1.2</span>
+                        <span class="text-sm text-gray-500">15.2 GB</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-secondary text-white py-2 !rounded-button whitespace-nowrap transition-colors">
+                        <i class="fas fa-download mr-2"></i> 下载
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-book text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">技术文档</h3>
+                    <p class="text-gray-600 mb-4">详细的使用说明文档</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">v1.0</span>
+                        <span class="text-sm text-gray-500">3.4 MB</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-secondary text-white py-2 !rounded-button whitespace-nowrap transition-colors">
+                        <i class="fas fa-download mr-2"></i> 下载
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-video text-indigo-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">演示视频</h3>
+                    <p class="text-gray-600 mb-4">算法演示视频</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">HD Quality</span>
+                        <span class="text-sm text-gray-500">156 MB</span>
+                    </div>
+                    <button class="w-full mt-4 bg-primary hover:bg-secondary text-white py-2 !rounded-button whitespace-nowrap transition-colors">
+                        <i class="fas fa-download mr-2"></i> 下载
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- License 页面 -->
+    <section id="license" class="section pt-24 px-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">许可证信息</h1>
+            
+            <div class="bg-white rounded-xl p-8 shadow-lg mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">MIT 许可证</h2>
+                <p class="text-gray-700 mb-6">
+                    版权所有 (c) 2024 张伟，李娜，王强，陈美华
+                </p>
+                
+                <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                    <p class="text-gray-700 leading-relaxed">
+                        特此免费授予获得本软件和相关文档文件（"软件"）副本的任何人无限制地处理本软件的权利，
+                        包括但不限于使用、复制、修改、合并、发布、分发、再许可和/或销售软件副本的权利，
+                        以及允许软件使用者这样做的权利，但须遵守以下条件：
+                    </p>
+                    <br>
+                    <p class="text-gray-700 leading-relaxed">
+                        上述版权声明和本许可声明应包含在软件的所有副本或实质性部分中。
+                    </p>
+                    <br>
+                    <p class="text-gray-700 leading-relaxed">
+                        本软件按"现状"提供，不提供任何形式的明示或暗示保证，包括但不限于适销性、
+                        特定用途适用性和非侵权性的保证。在任何情况下，作者或版权持有者均不对因使用本软件而产生的
+                        任何索赔、损害或其他责任负责，无论是在合同诉讼、侵权行为或其他方面。
+                    </p>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">使用条款</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-6">
+                    <li>您可以自由使用、修改和分发本软件</li>
+                    <li>商业使用完全允许</li>
+                    <li>必须保留原始版权声明和许可证</li>
+                    <li>不得使用作者的名字为衍生作品背书</li>
+                    <li>不提供技术支持，但欢迎社区贡献</li>
+                </ul>
+
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">学术引用要求</h3>
+                <p class="text-gray-700 mb-4">
+                    如果您在学术工作中使用了本软件或其衍生作品，请务必引用我们的论文：
+                </p>
+                <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
+                    <code class="text-sm text-gray-700">
+                        Zhang, W., Li, N., Wang, Q., & Chen, M. (2024). Human Motion Prediction Using Deep Learning. CVPR.
+                    </code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Extra 页面 -->
+    <section id="extra" class="section pt-24 px-8">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">更多信息</h1>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white rounded-xl p-8 shadow-lg">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">研究团队</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-semibold">ZW</div>
+                            <div>
+                                <p class="font-medium text-gray-800">张伟</p>
+                                <p class="text-sm text-gray-600">博士研究生，主要研究方向：计算机视觉、深度学习</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">LN</div>
+                            <div>
+                                <p class="font-medium text-gray-800">李娜</p>
+                                <p class="text-sm text-gray-600">副教授，主要研究方向：机器学习、模式识别</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-semibold">WQ</div>
+                            <div>
+                                <p class="font-medium text-gray-800">王强</p>
+                                <p class="text-sm text-gray-600">教授，主要研究方向：人工智能、计算机图形学</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">CM</div>
+                            <div>
+                                <p class="font-medium text-gray-800">陈美华</p>
+                                <p class="text-sm text-gray-600">博士后研究员，主要研究方向：人体姿态估计、动作识别</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-8 shadow-lg">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">联系我们</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-envelope text-primary text-lg"></i>
+                            <div>
+                                <p class="font-medium text-gray-800">邮箱</p>
+                                <p class="text-gray-600">hmp-research@university.edu.cn</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-map-marker-alt text-primary text-lg"></i>
+                            <div>
+                                <p class="font-medium text-gray-800">地址</p>
+                                <p class="text-gray-600">北京市海淀区清华大学计算机系</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-github text-primary text-lg"></i>
+                            <div>
+                                <p class="font-medium text-gray-800">GitHub</p>
+                                <p class="text-gray-600">github.com/hmp-research</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-question-circle text-primary text-lg"></i>
+                            <div>
+                                <p class="font-medium text-gray-800">问题反馈</p>
+                                <p class="text-gray-600">issues@hmp-research.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-8 shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">相关项目</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">3D 人体姿态估计</h3>
+                        <p class="text-gray-600 mb-4">
+                            基于单目图像的 3D 人体姿态估计技术，支持实时多人姿态检测。
+                        </p>
+                        <a href="#" class="text-primary hover:text-secondary font-medium">访问项目 <i class="fas fa-arrow-right ml-1 text-sm"></i></a>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">动作识别系统</h3>
+                        <p class="text-gray-600 mb-4">
+                            高精度的动作识别系统，支持复杂场景下的动作分类。
+                        </p>
+                        <a href="#" class="text-primary hover:text-secondary font-medium">访问项目 <i class="fas fa-arrow-right ml-1 text-sm"></i></a>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">虚拟试衣系统</h3>
+                        <p class="text-gray-600 mb-4">
+                            结合人体运动预测的虚拟试衣系统，提供更真实的试衣体验。
+                        </p>
+                        <a href="#" class="text-primary hover:text-secondary font-medium">访问项目 <i class="fas fa-arrow-right ml-1 text-sm"></i></a>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">智能监控分析</h3>
+                        <p class="text-gray-600 mb-4">
+                            基于人体运动分析的智能监控系统，用于异常行为检测。
+                        </p>
+                        <a href="#" class="text-primary hover:text-secondary font-medium">访问项目 <i class="fas fa-arrow-right ml-1 text-sm"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+        });
+
+        // 页面切换函数
+        function showSection(sectionId) {
+            // 隐藏所有section
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active-section');
+            });
+            
+            // 显示选中的section
+            document.getElementById(sectionId).classList.add('active-section');
+            
+            // 更新导航链接状态
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-primary');
+                link.classList.add('text-gray-700');
+            });
+            
+            event.target.classList.remove('text-gray-700');
+            event.target.classList.add('text-primary');
+        }
+
+        // 初始化首页
+        document.addEventListener('DOMContentLoaded', function() {
+            // 默认显示home页面，其他页面隐藏
+            document.querySelectorAll('.section').forEach((section, index) => {
+                if (index === 0) {
+                    section.classList.add('active-section');
+                } else {
+                    section.classList.remove('active-section');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
