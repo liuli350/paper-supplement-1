@@ -89,6 +89,40 @@
         html {
             scroll-behavior: smooth;
         }
+
+        /* 自定义视频控制样式 */
+        .video-progress-container {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .video-progress-bar {
+            height: 100%;
+            background-color: #dc2626; /* 红色进度条，匹配播放按钮 */
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        .video-progress-handle {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: white;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .video-progress-container:hover .video-progress-handle {
+            opacity: 1;
+        }
+        .video-controls {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-white text-gray-800">
@@ -100,7 +134,7 @@
                 <a href="index.html" class="nav-link text-primary hover:text-accent transition-colors">Home</a>
                 <a href="downloads.html" class="nav-link text-gray-700 hover:text-accent transition-colors">Downloads</a>
                 <a href="license.html" class="nav-link text-gray-700 hover:text-accent transition-colors">License</a>
-                <a href="visualization.html" class="nav-link text-primary hover:text-accent transition-colors">Visualization</a>
+                <a href="visualization.html" class="nav-link text-gray-700 hover:text-accent transition-colors">Visualization</a>
                 <a href="contact.html" class="nav-link text-gray-700 hover:text-accent transition-colors">Contact</a>
             </div>
         </div>
@@ -169,28 +203,56 @@
             </div>
         </div>
 
-        <!-- Video 区块 (标题放大+居中) -->
+        <!-- Video 区块 (标题放大+居中) - 完整控制功能版 -->
         <div id="video" class="max-w-5xl mx-auto mb-16 px-8">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 text-center">Video</h2>
             <div class="bg-gray-50 border border-gray-200 rounded-sm p-4">
-                <!-- Video 播放器 (AMASS 风格) -->
-                <div class="relative w-full aspect-video bg-black/10 flex items-center justify-center">
+                <!-- Video 播放器 (AMASS 风格 + 完整控制功能) -->
+                <div class="relative w-full aspect-video bg-black/10 video-controls" id="videoContainer">
+                    <!-- 视频核心元素 -->
+                    <video 
+                        id="demoVideo"
+                        class="w-full h-full object-cover"
+                        poster="./video/thumbnail.jpg"  <!-- 封面图路径，可调整 -->
+                        preload="metadata"
+                        style="display: none;"  <!-- 隐藏原生控件，使用自定义控件 -->
+                    >
+                        <source src="./video/presentation.mp4" type="video/mp4">
+                        Your browser does not support the video tag. Please update your browser or download the video to play.
+                    </video>
+                    
+                    <!-- 视频封面/占位图 -->
                     <img 
-                        src="../video/presentation.mp4" 
+                        id="videoThumbnail"
+                        src="./video/thumbnail.jpg"  <!-- 和poster保持一致 -->
                         alt="Video thumbnail" 
                         class="w-full h-full object-cover opacity-80"
                     >
-                    <div class="absolute inset-0 flex items-center justify-center">
+                    
+                    <!-- 自定义播放/暂停按钮 -->
+                    <div id="customPlayBtn" class="absolute inset-0 flex items-center justify-center opacity-100 pointer-events-auto">
                         <button class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center text-white hover:bg-red-700 transition-colors">
-                            <i class="fas fa-play text-3xl ml-1"></i>
+                            <i id="playIcon" class="fas fa-play text-3xl ml-1"></i>
                         </button>
                     </div>
-                    <div class="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 flex justify-between items-center text-xs">
-                        <span>0:00 / 10:32</span>
-                        <div class="flex items-center gap-2">
-                            <button class="hover:text-gray-300"><i class="fas fa-volume-up"></i></button>
-                            <button class="hover:text-gray-300">Watch later</button>
-                            <button class="hover:text-gray-300">Share</button>
+                    
+                    <!-- 自定义控制栏 (底部) -->
+                    <div class="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-3">
+                        <!-- 进度条 -->
+                        <div class="video-progress-container mb-2" id="progressContainer">
+                            <div class="video-progress-bar" id="progressBar"></div>
+                            <div class="video-progress-handle" id="progressHandle"></div>
+                        </div>
+                        <!-- 时间和功能按钮 -->
+                        <div class="flex justify-between items-center text-xs">
+                            <span id="videoTime">0:00 / 0:00</span>
+                            <div class="flex items-center gap-3">
+                                <button id="volumeBtn" class="hover:text-gray-300 transition-colors">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                                <button class="hover:text-gray-300">Watch later</button>
+                                <button class="hover:text-gray-300">Share</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -256,7 +318,7 @@
         </div>
     </section>
 
-    <!-- JavaScript -->
+    <!-- JavaScript - 完整视频控制逻辑 -->
     <script>
         // 导航栏滚动效果
         window.addEventListener('scroll', function() {
@@ -266,6 +328,144 @@
             } else {
                 navbar.classList.remove('shadow-sm');
             }
+        });
+
+        // 视频完整控制逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取核心元素
+            const video = document.getElementById('demoVideo');
+            const thumbnail = document.getElementById('videoThumbnail');
+            const playBtn = document.getElementById('customPlayBtn');
+            const playIcon = document.getElementById('playIcon');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressHandle = document.getElementById('progressHandle');
+            const videoTime = document.getElementById('videoTime');
+            const videoContainer = document.getElementById('videoContainer');
+            const volumeBtn = document.getElementById('volumeBtn');
+            
+            // 初始化变量
+            let isDragging = false;
+            let videoDuration = 0;
+
+            // 等待视频元数据加载完成
+            video.addEventListener('loadedmetadata', function() {
+                videoDuration = video.duration;
+                videoTime.textContent = `0:00 / ${formatTime(videoDuration)}`;
+            });
+
+            // 播放/暂停切换（点击中央按钮）
+            playBtn.addEventListener('click', togglePlayPause);
+
+            // 点击视频区域也能播放/暂停
+            videoContainer.addEventListener('click', function(e) {
+                // 排除进度条和功能按钮区域的点击
+                if (!progressContainer.contains(e.target) && e.target !== volumeBtn && !volumeBtn.contains(e.target)) {
+                    togglePlayPause();
+                }
+            });
+
+            // 播放/暂停核心函数
+            function togglePlayPause() {
+                if (video.paused) {
+                    // 播放视频
+                    video.play();
+                    thumbnail.style.opacity = '0';  // 隐藏封面图
+                    playBtn.style.opacity = '0';    // 隐藏中央播放按钮
+                    playIcon.classList.remove('fa-play');
+                    playIcon.classList.add('fa-pause');
+                } else {
+                    // 暂停视频
+                    video.pause();
+                    playBtn.style.opacity = '1';    // 显示中央按钮
+                    playIcon.classList.remove('fa-pause');
+                    playIcon.classList.add('fa-play');
+                }
+            }
+
+            // 实时更新进度条和时间
+            video.addEventListener('timeupdate', function() {
+                if (!isDragging && videoDuration) {
+                    const progress = (video.currentTime / videoDuration) * 100;
+                    updateProgressUI(progress);
+                    videoTime.textContent = `${formatTime(video.currentTime)} / ${formatTime(videoDuration)}`;
+                }
+            });
+
+            // 视频结束后重置状态
+            video.addEventListener('ended', function() {
+                video.currentTime = 0;
+                updateProgressUI(0);
+                thumbnail.style.opacity = '80';  // 显示封面
+                playBtn.style.opacity = '1';     // 显示播放按钮
+                playIcon.classList.remove('fa-pause');
+                playIcon.classList.add('fa-play');
+            });
+
+            // 进度条点击跳转
+            progressContainer.addEventListener('click', function(e) {
+                if (videoDuration) {
+                    const rect = progressContainer.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const progress = (clickX / rect.width) * 100;
+                    updateProgress(progress);
+                }
+            });
+
+            // 进度条拖拽功能
+            progressContainer.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                document.addEventListener('mousemove', handleDrag);
+                document.addEventListener('mouseup', function() {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', handleDrag);
+                });
+                // 初始拖拽位置
+                handleDrag(e);
+            });
+
+            // 处理拖拽移动
+            function handleDrag(e) {
+                if (isDragging && videoDuration) {
+                    const rect = progressContainer.getBoundingClientRect();
+                    const dragX = e.clientX - rect.left;
+                    let progress = (dragX / rect.width) * 100;
+                    // 限制进度在0-100之间
+                    progress = Math.max(0, Math.min(100, progress));
+                    updateProgressUI(progress);
+                }
+            }
+
+            // 更新进度条UI（不改变视频播放位置）
+            function updateProgressUI(progress) {
+                progressBar.style.width = `${progress}%`;
+                progressHandle.style.left = `${progress}%`;
+            }
+
+            // 更新视频进度（同步UI和播放位置）
+            function updateProgress(progress) {
+                updateProgressUI(progress);
+                video.currentTime = (progress / 100) * videoDuration;
+                videoTime.textContent = `${formatTime(video.currentTime)} / ${formatTime(videoDuration)}`;
+            }
+
+            // 格式化时间：秒 -> 分:秒
+            function formatTime(seconds) {
+                if (isNaN(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            // 音量控制（可选功能）
+            volumeBtn.addEventListener('click', function() {
+                video.muted = !video.muted;
+                if (video.muted) {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
         });
     </script>
 </body>
