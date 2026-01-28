@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- 自定义配置 -->
+
     <script>
         tailwind.config = {
             theme: {
@@ -25,30 +25,21 @@
             }
         }
     </script>
+
     <style type="text/tailwindcss">
         @layer utilities {
-            .text-shadow {
-                text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            }
-            .aspect-video {
-                aspect-ratio: 16 / 9;
-            }
-            .btn-active {
-                @apply bg-accent text-white;
-            }
-            .btn-inactive {
-                @apply bg-gray-100 text-gray-800 hover:bg-gray-200;
-            }
+            .btn-active { @apply bg-accent text-white; }
+            .btn-inactive { @apply bg-gray-100 text-gray-800 hover:bg-gray-200; }
+            /* 让gif展示区更大：4:3 比 16:9 更高 */
+            .aspect-4-3 { aspect-ratio: 4 / 3; }
         }
     </style>
+
     <style>
-        /* 核心修复：解决导航栏遮挡问题 */
         body {
-            padding-top: 80px; /* 为固定导航栏预留空间 */
+            padding-top: 80px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
-        
-        /* 固定导航栏样式 */
         #navbar {
             height: 80px;
             display: flex;
@@ -61,31 +52,23 @@
             background-color: white;
             border-bottom: 1px solid #e5e7eb;
         }
-        
-        /* 平滑滚动 */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* 可视化容器样式 */
-        .visualization-container {
-            transition: all 0.3s ease;
-        }
-        
-        /* 加载动画 */
+        html { scroll-behavior: smooth; }
+
+        .visualization-container { transition: all 0.3s ease; }
+
         .loader {
             border-top-color: #0066cc;
             animation: spinner 0.8s linear infinite;
         }
-        
         @keyframes spinner {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
     </style>
 </head>
+
 <body class="bg-white text-gray-800">
-    <!-- 导航栏 (保持风格统一) -->
+    <!-- 导航栏 -->
     <nav id="navbar" class="px-8">
         <div class="max-w-5xl mx-auto w-full flex justify-between items-center">
             <div class="text-xl font-medium text-primary">HMP Research</div>
@@ -99,50 +82,60 @@
         </div>
     </nav>
 
-    <!-- 可视化页面主体 -->
     <section class="bg-white">
         <div class="max-w-5xl mx-auto py-12 px-8">
-            <!-- 页面标题 -->
             <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Interactive Visualization</h1>
-            
-            <!-- 交互控制面板 -->
+
             <div class="bg-white border border-gray-200 rounded-sm p-6 mb-8">
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">Model & Dataset Selection</h2>
-                
-                <!-- 选择器区域 -->
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    <!-- 模型选择 -->
+                    <!-- Ours（固定） -->
                     <div class="bg-gray-50 p-4 rounded-sm">
-                        <h3 class="font-medium text-gray-900 mb-4 text-lg">Select Model</h3>
-                        <div class="flex flex-wrap gap-3 mb-4">
-                            <button id="model1" class="model-btn btn-active px-4 py-2 rounded-sm transition-colors" data-model="STCNet">STCNet (Ours)</button>
-                            <button id="model2" class="model-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-model="Transformer">Transformer</button>
-                            <button id="model3" class="model-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-model="LSTM">LSTM</button>
-                            <button id="model4" class="model-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-model="GRU">GRU</button>
+                        <h3 class="font-medium text-gray-900 mb-3 text-lg">Ours (Fixed)</h3>
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="text-xl font-semibold text-primary">STCNet</p>
+                                <p class="text-sm text-gray-600">Always shown on the left panel</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-sm bg-accent text-white text-sm">
+                                <i class="fas fa-lock mr-2"></i> Locked
+                            </span>
                         </div>
-                        <p class="text-sm text-gray-600">
-                            <i class="fas fa-info-circle mr-1 text-accent"></i> 
-                            Click to switch between different motion prediction models
-                        </p>
                     </div>
-                    
-                    <!-- 数据集选择 -->
+
+                    <!-- Baseline -->
                     <div class="bg-gray-50 p-4 rounded-sm">
-                        <h3 class="font-medium text-gray-900 mb-4 text-lg">Select Dataset</h3>
-                        <div class="flex flex-wrap gap-3 mb-4">
-                            <button id="dataset1" class="dataset-btn btn-active px-4 py-2 rounded-sm transition-colors" data-dataset="Human3.6M">Human3.6M</button>
-                            <button id="dataset2" class="dataset-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-dataset="AMASS">AMASS</button>
-                            <button id="dataset3" class="dataset-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-dataset="CMU">CMU Mocap</button>
+                        <h3 class="font-medium text-gray-900 mb-4 text-lg">Select Baseline Model</h3>
+                        <div class="flex flex-wrap gap-3 mb-2">
+                            <button id="baseline1" class="baseline-btn btn-active px-4 py-2 rounded-sm transition-colors" data-baseline="KSOF">
+                                KSOF (Baseline)
+                            </button>
                         </div>
                         <p class="text-sm text-gray-600">
-                            <i class="fas fa-info-circle mr-1 text-accent"></i> 
-                            Choose the dataset to visualize prediction results
+                            <i class="fas fa-info-circle mr-1 text-accent"></i>
+                            注意：切换 baseline 不会立刻改变展示，需点击 Render。
                         </p>
                     </div>
                 </div>
-                
+
+                <!-- 数据集选择（初始不默认选中） -->
+                <div class="bg-gray-50 p-4 rounded-sm mb-2">
+                    <h3 class="font-medium text-gray-900 mb-4 text-lg">Select Dataset</h3>
+                    <div class="flex flex-wrap gap-3 mb-2">
+                        <button id="dataset1" class="dataset-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-dataset="Human3.6M">Human3.6M</button>
+                        <button id="dataset2" class="dataset-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-dataset="AMASS">AMASS</button>
+                        <button id="dataset3" class="dataset-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-dataset="3DPW">3DPW</button>
+                    </div>
+                </div>
+
+                <p id="datasetWarning" class="hidden text-sm text-red-600 mt-2">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    Please select a dataset before rendering.
+                </p>
+
                 <!-- 操作按钮 -->
-                <div class="flex justify-center gap-4 mb-8">
+                <div class="flex justify-center gap-4 my-8">
                     <button id="renderBtn" class="bg-accent text-white px-6 py-3 rounded-sm hover:bg-blue-700 transition-colors flex items-center">
                         <i class="fas fa-play mr-2"></i> Render Visualization
                     </button>
@@ -150,220 +143,343 @@
                         <i class="fas fa-refresh mr-2"></i> Reset
                     </button>
                 </div>
-                
-                <!-- 可视化结果区域 -->
+
+                <!-- 可视化区域 -->
                 <div id="visualizationArea" class="visualization-container border border-gray-200 rounded-sm overflow-hidden">
-                    <!-- 初始状态：加载提示 -->
-                    <div id="loadingState" class="hidden w-full aspect-video bg-gray-50 flex flex-col items-center justify-center">
+                    <!-- 空状态（默认显示） -->
+                    <div id="emptyState" class="w-full aspect-4-3 bg-gray-50 flex flex-col items-center justify-center text-center px-6">
+                        <div class="w-14 h-14 rounded-full bg-white border border-gray-200 flex items-center justify-center mb-4">
+                            <i class="fas fa-image text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-800 font-medium mb-1">No visualization yet</p>
+                        <p class="text-gray-600 text-sm">
+                            Select a dataset and click <span class="font-semibold">Render Visualization</span>.
+                        </p>
+                    </div>
+
+                    <!-- 加载状态：每次 Render 固定 5 秒 -->
+                    <div id="loadingState" class="hidden w-full aspect-4-3 bg-gray-50 flex flex-col items-center justify-center">
                         <div class="loader w-16 h-16 border-4 border-gray-200 rounded-full mb-4"></div>
                         <p class="text-gray-700">Rendering visualization... Please wait.</p>
                     </div>
-                    
-                    <!-- 可视化内容 -->
-                    <div id="resultVisualization" class="w-full aspect-video bg-gray-100 relative">
-                        <!-- 默认可视化内容 -->
-                        <img 
-                            src="https://via.placeholder.com/1280x720/eeeeee/666666?text=STCNet+on+Human3.6M+Dataset" 
-                            alt="Default Visualization" 
-                            class="w-full h-full object-cover"
-                        >
-                        <!-- 信息叠加层 -->
-                        <div class="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-sm text-sm">
-                            Current: STCNet | Human3.6M
+
+                    <!-- 双 GIF（默认隐藏） -->
+                    <div id="resultVisualization" class="hidden w-full bg-white">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+                            <!-- 左：Ours -->
+                            <div class="relative w-full aspect-4-3 bg-gray-100 border-b md:border-b-0 md:border-r border-gray-200">
+                                <img
+                                    id="oursGif"
+                                    src=""
+                                    alt="Ours GIF"
+                                    class="w-full h-full object-cover cursor-pointer select-none"
+                                    title="Click to replay"
+                                >
+                                <div id="oursOverlay" class="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-sm text-sm">
+                                    Ours: STCNet | -
+                                </div>
+                                <div class="absolute bottom-3 right-3 bg-black/60 text-white px-2 py-1 rounded-sm text-xs">
+                                    Click to replay
+                                </div>
+                            </div>
+
+                            <!-- 右：Baseline -->
+                            <div class="relative w-full aspect-4-3 bg-gray-100">
+                                <img
+                                    id="baseGif"
+                                    src=""
+                                    alt="Baseline GIF"
+                                    class="w-full h-full object-cover cursor-pointer select-none"
+                                    title="Click to replay"
+                                >
+                                <div id="baseOverlay" class="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-sm text-sm">
+                                    Baseline: KSOF | -
+                                </div>
+                                <div class="absolute bottom-3 right-3 bg-black/60 text-white px-2 py-1 rounded-sm text-xs">
+                                    Click to replay
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- 结果指标 -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    <div class="bg-gray-50 p-4 rounded-sm">
-                        <h4 class="font-medium text-gray-900 mb-2">MPJPE (mm)</h4>
-                        <p id="mpjpeValue" class="text-2xl font-bold text-accent">45.2</p>
-                        <p class="text-sm text-gray-600">Lower is better</p>
+
+                <!-- 指标区域：默认隐藏 -->
+                <div id="metricsArea" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="bg-white border border-gray-200 rounded-sm p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900">Ours (STCNet) Metrics</h3>
+                            <span class="text-sm text-gray-600">Dataset: <span id="oursDatasetTag">-</span></span>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-sm">
+                            <h4 class="font-medium text-gray-900 mb-2">MPJPE (mm)</h4>
+                            <p id="oursMpjpeValue" class="text-2xl font-bold text-accent">-</p>
+                            <p class="text-sm text-gray-600">Lower is better</p>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-sm">
-                        <h4 class="font-medium text-gray-900 mb-2">Accuracy (%)</h4>
-                        <p id="accuracyValue" class="text-2xl font-bold text-accent">92.8</p>
-                        <p class="text-sm text-gray-600">Higher is better</p>
+
+                    <div class="bg-white border border-gray-200 rounded-sm p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900">Baseline Metrics</h3>
+                            <span class="text-sm text-gray-600"><span id="baseModelTag">KSOF</span> | <span id="baseDatasetTag">-</span></span>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-sm">
+                            <h4 class="font-medium text-gray-900 mb-2">MPJPE (mm)</h4>
+                            <p id="baseMpjpeValue" class="text-2xl font-bold text-accent">-</p>
+                            <p class="text-sm text-gray-600">Lower is better</p>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-sm">
-                        <h4 class="font-medium text-gray-900 mb-2">Inference Time (ms)</h4>
-                        <p id="inferenceValue" class="text-2xl font-bold text-accent">18.7</p>
-                        <p class="text-sm text-gray-600">Lower is better</p>
-                    </div>
-                </div>
-                
-                <!-- 说明文本 -->
-                <div class="mt-8 text-gray-700">
-                    <h3 class="font-medium text-gray-900 mb-2">Visualization Explanation</h3>
-                    <p class="text-sm leading-relaxed">
-                        The visualization shows the predicted human motion sequences (red) compared with ground truth (blue) over 200ms time window. 
-                        The metrics on the bottom represent the key performance indicators for the selected model on the chosen dataset:
-                    </p>
-                    <ul class="text-sm text-gray-700 mt-2 pl-5 list-disc">
-                        <li><strong>MPJPE</strong>: Mean Per Joint Position Error (lower values indicate more accurate predictions)</li>
-                        <li><strong>Accuracy</strong>: Motion classification accuracy for action recognition tasks</li>
-                        <li><strong>Inference Time</strong>: Model inference latency per frame (real-time performance)</li>
-                    </ul>
                 </div>
             </div>
-            
-            <!-- 页脚 -->
+
             <div class="text-sm text-gray-600 flex flex-wrap gap-4 pt-4 border-t border-gray-200">
-                <p>&copy; 2024 Anonymous Research Team - <a href="license.html" class="text-blue-600 hover:underline">Privacy Policy</a> - <a href="license.html" class="text-blue-600 hover:underline">License</a></p>
+                <p>&copy; 2026 Anonymous Research Team - <a href="license.html" class="text-blue-600 hover:underline">Privacy Policy</a> - <a href="license.html" class="text-blue-600 hover:underline">License</a></p>
             </div>
         </div>
     </section>
 
-    <!-- JavaScript 交互逻辑 -->
     <script>
-        // 导航栏滚动效果
+        // navbar shadow
         window.addEventListener('scroll', function() {
             const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('shadow-sm');
-            } else {
-                navbar.classList.remove('shadow-sm');
-            }
+            if (window.scrollY > 50) navbar.classList.add('shadow-sm');
+            else navbar.classList.remove('shadow-sm');
         });
 
-        // 全局变量存储当前选择
-        let currentModel = "STCNet";
-        let currentDataset = "Human3.6M";
-        
-        // 模拟的模型-数据集对应指标数据
-        const performanceData = {
+        // ======= 状态：selected ≠ rendered（修复“点数据集立刻播放”的bug） =======
+        const OURS_MODEL = "STCNet";
+
+        let selectedBaseline = "KSOF";
+        let selectedDataset  = null;
+
+        let renderedBaseline = null;
+        let renderedDataset  = null;
+
+        let isRendering = false;
+
+        // ======= 数据 =======
+        const mpjpeData = {
             "STCNet": {
-                "Human3.6M": { mpjpe: 45.2, accuracy: 92.8, inference: 18.7 },
-                "AMASS": { mpjpe: 48.5, accuracy: 91.2, inference: 19.3 },
-                "CMU": { mpjpe: 51.8, accuracy: 89.7, inference: 20.1 }
+                "Human3.6M": 45.2,
+                "AMASS": 48.5,
+                "3DPW": 54.1
             },
-            "Transformer": {
-                "Human3.6M": { mpjpe: 52.7, accuracy: 88.9, inference: 45.6 },
-                "AMASS": { mpjpe: 55.3, accuracy: 87.4, inference: 47.2 },
-                "CMU": { mpjpe: 58.9, accuracy: 86.1, inference: 48.8 }
-            },
-            "LSTM": {
-                "Human3.6M": { mpjpe: 61.4, accuracy: 85.3, inference: 12.4 },
-                "AMASS": { mpjpe: 64.8, accuracy: 83.7, inference: 13.1 },
-                "CMU": { mpjpe: 67.2, accuracy: 82.1, inference: 13.8 }
-            },
-            "GRU": {
-                "Human3.6M": { mpjpe: 58.9, accuracy: 87.6, inference: 14.2 },
-                "AMASS": { mpjpe: 61.5, accuracy: 86.2, inference: 14.9 },
-                "CMU": { mpjpe: 64.1, accuracy: 84.8, inference: 15.6 }
+            "KSOF": {
+                "Human3.6M": 52.1,
+                "AMASS": 55.7,
+                "3DPW": 61.0
             }
         };
 
-        // 模型按钮点击事件
-        document.querySelectorAll('.model-btn').forEach(btn => {
+        const gifData = {
+            "STCNet": {
+                "Human3.6M": "../gifs/ours/Human3.6M.gif",
+                "AMASS": "../gifs/ours/AMASS.gif",
+                "3DPW": "../gifs/ours/3DPW.gif"
+            },
+            "KSOF": {
+                "Human3.6M": "../gifs/baseline/KSOF/Human3.6M.gif",
+                "AMASS": "../gifs/baseline/KSOF/AMASS.gif",
+                "3DPW": "../gifs/baseline/KSOF/3DPW.gif"
+            }
+        };
+
+        // ======= UI: baseline 选择（不触发展示更新） =======
+        document.querySelectorAll('.baseline-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                // 重置所有模型按钮样式
-                document.querySelectorAll('.model-btn').forEach(b => {
+                document.querySelectorAll('.baseline-btn').forEach(b => {
                     b.classList.remove('btn-active');
                     b.classList.add('btn-inactive');
                 });
-                // 设置当前按钮为激活状态
                 this.classList.remove('btn-inactive');
                 this.classList.add('btn-active');
-                // 更新当前模型
-                currentModel = this.dataset.model;
-                // 更新信息文本
-                updateInfoOverlay();
+
+                selectedBaseline = this.dataset.baseline;
+                // 不更新GIF/指标（必须点 Render）
             });
         });
 
-        // 数据集按钮点击事件
+        // ======= UI: dataset 选择（不触发展示更新） =======
         document.querySelectorAll('.dataset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                // 重置所有数据集按钮样式
+                document.getElementById('datasetWarning').classList.add('hidden');
+
                 document.querySelectorAll('.dataset-btn').forEach(b => {
                     b.classList.remove('btn-active');
                     b.classList.add('btn-inactive');
                 });
-                // 设置当前按钮为激活状态
                 this.classList.remove('btn-inactive');
                 this.classList.add('btn-active');
-                // 更新当前数据集
-                currentDataset = this.dataset.dataset;
-                // 更新信息文本
-                updateInfoOverlay();
+
+                selectedDataset = this.dataset.dataset;
+                // 不更新GIF/指标（必须点 Render）
             });
         });
 
-        // 渲染按钮点击事件
+        // ======= Render：每次固定 5 秒 loading =======
         document.getElementById('renderBtn').addEventListener('click', function() {
-            // 显示加载状态
-            document.getElementById('loadingState').classList.remove('hidden');
+            if (isRendering) return;
+
+            if (!selectedDataset) {
+                document.getElementById('datasetWarning').classList.remove('hidden');
+                return;
+            }
+
+            isRendering = true;
+            setRenderBtnDisabled(true);
+
+            document.getElementById('datasetWarning').classList.add('hidden');
+
+            // 进入 loading：隐藏空态/结果/指标
+            document.getElementById('emptyState').classList.add('hidden');
             document.getElementById('resultVisualization').classList.add('hidden');
-            
-            // 模拟加载延迟 (2秒)
+            document.getElementById('metricsArea').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+
+            // 固定 5 秒
             setTimeout(() => {
-                // 隐藏加载状态
+                // commit 本次渲染的配置
+                renderedDataset  = selectedDataset;
+                renderedBaseline = selectedBaseline;
+
+                // 显示结果
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('resultVisualization').classList.remove('hidden');
-                
-                // 更新可视化图片
-                updateVisualizationImage();
-                // 更新性能指标
-                updatePerformanceMetrics();
-                
-                // 添加轻微的动画效果
-                const container = document.getElementById('visualizationArea');
-                container.style.opacity = 0;
-                setTimeout(() => {
-                    container.style.opacity = 1;
-                }, 50);
-            }, 2000);
+                document.getElementById('metricsArea').classList.remove('hidden');
+
+                updateTagsAndOverlaysFromRendered();
+                updateGifsFromRendered();
+                updateMetricsFromRendered();
+
+                isRendering = false;
+                setRenderBtnDisabled(false);
+            }, 5000);
         });
 
-        // 重置按钮点击事件
+        // ======= Reset：回到完全空 =======
         document.getElementById('resetBtn').addEventListener('click', function() {
-            // 重置模型选择
-            document.querySelectorAll('.model-btn').forEach(btn => {
+            isRendering = false;
+            setRenderBtnDisabled(false);
+
+            // baseline reset
+            document.querySelectorAll('.baseline-btn').forEach(btn => {
                 btn.classList.remove('btn-active');
                 btn.classList.add('btn-inactive');
             });
-            document.getElementById('model1').classList.remove('btn-inactive');
-            document.getElementById('model1').classList.add('btn-active');
-            currentModel = "STCNet";
-            
-            // 重置数据集选择
+            document.getElementById('baseline1').classList.remove('btn-inactive');
+            document.getElementById('baseline1').classList.add('btn-active');
+            selectedBaseline = "KSOF";
+
+            // dataset reset：取消所有选中
             document.querySelectorAll('.dataset-btn').forEach(btn => {
                 btn.classList.remove('btn-active');
                 btn.classList.add('btn-inactive');
             });
-            document.getElementById('dataset1').classList.remove('btn-inactive');
-            document.getElementById('dataset1').classList.add('btn-active');
-            currentDataset = "Human3.6M";
-            
-            // 重置可视化和指标
-            updateInfoOverlay();
-            updateVisualizationImage();
-            updatePerformanceMetrics();
+            selectedDataset = null;
+
+            // rendered 清空
+            renderedBaseline = null;
+            renderedDataset  = null;
+
+            // UI回到空态
+            document.getElementById('datasetWarning').classList.add('hidden');
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('resultVisualization').classList.add('hidden');
+            document.getElementById('metricsArea').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+
+            // 清空gif src
+            document.getElementById('oursGif').src = "";
+            document.getElementById('baseGif').src = "";
+
+            clearTagsAndOverlays();
+            clearMetrics();
         });
 
-        // 更新信息叠加层
-        function updateInfoOverlay() {
-            const overlay = document.querySelector('#resultVisualization .absolute');
-            overlay.textContent = `Current: ${currentModel} | ${currentDataset}`;
+        function setRenderBtnDisabled(disabled) {
+            const btn = document.getElementById('renderBtn');
+            btn.disabled = disabled;
+            if (disabled) {
+                btn.classList.add('opacity-60', 'cursor-not-allowed');
+            } else {
+                btn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
         }
 
-        // 更新可视化图片 (模拟不同组合的图片)
-        function updateVisualizationImage() {
-            const img = document.querySelector('#resultVisualization img');
-            const placeholderText = `${currentModel} on ${currentDataset} Dataset`;
-            img.src = `https://via.placeholder.com/1280x720/eeeeee/666666?text=${encodeURIComponent(placeholderText)}`;
-            img.alt = placeholderText;
+        // ======= 使用 rendered 状态更新（关键修复点） =======
+        function updateTagsAndOverlaysFromRendered() {
+            const dsText = renderedDataset ?? "-";
+            const baseText = renderedBaseline ?? "KSOF";
+
+            document.getElementById('oursDatasetTag').textContent = dsText;
+            document.getElementById('baseModelTag').textContent = baseText;
+            document.getElementById('baseDatasetTag').textContent = dsText;
+
+            document.getElementById('oursOverlay').textContent = `Ours: ${OURS_MODEL} | ${dsText}`;
+            document.getElementById('baseOverlay').textContent = `Baseline: ${baseText} | ${dsText}`;
         }
 
-        // 更新性能指标
-        function updatePerformanceMetrics() {
-            const data = performanceData[currentModel][currentDataset];
-            document.getElementById('mpjpeValue').textContent = data.mpjpe;
-            document.getElementById('accuracyValue').textContent = data.accuracy;
-            document.getElementById('inferenceValue').textContent = data.inference;
+        function updateGifsFromRendered() {
+            if (!renderedDataset || !renderedBaseline) return;
+
+            const oursGif = document.getElementById('oursGif');
+            const baseGif = document.getElementById('baseGif');
+
+            const oursPath = gifData[OURS_MODEL]?.[renderedDataset];
+            const basePath = gifData[renderedBaseline]?.[renderedDataset];
+
+            const t = Date.now();
+            oursGif.src = oursPath ? `${oursPath}?t=${t}` : "";
+            baseGif.src = basePath ? `${basePath}?t=${t}` : "";
+
+            if (!oursPath) console.warn(`Missing GIF path: gifData["${OURS_MODEL}"]["${renderedDataset}"]`);
+            if (!basePath) console.warn(`Missing GIF path: gifData["${renderedBaseline}"]["${renderedDataset}"]`);
         }
+
+        function updateMetricsFromRendered() {
+            if (!renderedDataset || !renderedBaseline) return;
+
+            const ours = mpjpeData[OURS_MODEL]?.[renderedDataset];
+            const base = mpjpeData[renderedBaseline]?.[renderedDataset];
+
+            document.getElementById('oursMpjpeValue').textContent = (ours ?? "-");
+            document.getElementById('baseMpjpeValue').textContent = (base ?? "-");
+        }
+
+        // ======= 点击 GIF 重放（重放的是“当前渲染出的”gif） =======
+        function replayGif(imgEl, path) {
+            if (!path) return;
+            const t = Date.now();
+            imgEl.src = `${path}?t=${t}`;
+        }
+
+        document.getElementById('oursGif').addEventListener('click', () => {
+            if (!renderedDataset) return;
+            const path = gifData[OURS_MODEL]?.[renderedDataset];
+            replayGif(document.getElementById('oursGif'), path);
+        });
+
+        document.getElementById('baseGif').addEventListener('click', () => {
+            if (!renderedDataset || !renderedBaseline) return;
+            const path = gifData[renderedBaseline]?.[renderedDataset];
+            replayGif(document.getElementById('baseGif'), path);
+        });
+
+        function clearTagsAndOverlays() {
+            document.getElementById('oursDatasetTag').textContent = "-";
+            document.getElementById('baseModelTag').textContent = "KSOF";
+            document.getElementById('baseDatasetTag').textContent = "-";
+            document.getElementById('oursOverlay').textContent = `Ours: ${OURS_MODEL} | -`;
+            document.getElementById('baseOverlay').textContent = `Baseline: KSOF | -`;
+        }
+
+        function clearMetrics() {
+            document.getElementById('oursMpjpeValue').textContent = "-";
+            document.getElementById('baseMpjpeValue').textContent = "-";
+        }
+
+        // 初始化：空态
+        clearTagsAndOverlays();
+        clearMetrics();
     </script>
 </body>
 </html>
