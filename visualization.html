@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualization - HMP Research</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- 自定义配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a344f',
+                        secondary: '#ecc94b',
+                        accent: '#0066cc'
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            }
+            .aspect-video {
+                aspect-ratio: 16 / 9;
+            }
+            .btn-active {
+                @apply bg-accent text-white;
+            }
+            .btn-inactive {
+                @apply bg-gray-100 text-gray-800 hover:bg-gray-200;
+            }
+        }
+    </style>
+    <style>
+        /* 核心修复：解决导航栏遮挡问题 */
+        body {
+            padding-top: 80px; /* 为固定导航栏预留空间 */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        /* 固定导航栏样式 */
+        #navbar {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 可视化容器样式 */
+        .visualization-container {
+            transition: all 0.3s ease;
+        }
+        
+        /* 加载动画 */
+        .loader {
+            border-top-color: #0066cc;
+            animation: spinner 0.8s linear infinite;
+        }
+        
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+    <!-- 导航栏 (保持风格统一) -->
+    <nav id="navbar" class="px-8">
+        <div class="max-w-5xl mx-auto w-full flex justify-between items-center">
+            <div class="text-xl font-medium text-primary">HMP Research</div>
+            <div class="flex space-x-8">
+                <a href="index.html" class="nav-link text-gray-700 hover:text-accent transition-colors">Home</a>
+                <a href="downloads.html" class="nav-link text-gray-700 hover:text-accent transition-colors">Downloads</a>
+                <a href="license.html" class="nav-link text-gray-700 hover:text-accent transition-colors">License</a>
+                <a href="visualization.html" class="nav-link text-primary hover:text-accent transition-colors">Visualization</a>
+                <a href="contact.html" class="nav-link text-gray-700 hover:text-accent transition-colors">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 可视化页面主体 -->
+    <section class="bg-white">
+        <div class="max-w-5xl mx-auto py-12 px-8">
+            <!-- 页面标题 -->
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Interactive Visualization</h1>
+            
+            <!-- 交互控制面板 -->
+            <div class="bg-white border border-gray-200 rounded-sm p-6 mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">Model & Dataset Selection</h2>
+                
+                <!-- 选择器区域 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- 模型选择 -->
+                    <div class="bg-gray-50 p-4 rounded-sm">
+                        <h3 class="font-medium text-gray-900 mb-4 text-lg">Select Model</h3>
+                        <div class="flex flex-wrap gap-3 mb-4">
+                            <button id="model1" class="model-btn btn-active px-4 py-2 rounded-sm transition-colors" data-model="STCNet">STCNet (Ours)</button>
+                            <button id="model2" class="model-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-model="Transformer">Transformer</button>
+                            <button id="model3" class="model-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-model="LSTM">LSTM</button>
+                            <button id="model4" class="model-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-model="GRU">GRU</button>
+                        </div>
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-info-circle mr-1 text-accent"></i> 
+                            Click to switch between different motion prediction models
+                        </p>
+                    </div>
+                    
+                    <!-- 数据集选择 -->
+                    <div class="bg-gray-50 p-4 rounded-sm">
+                        <h3 class="font-medium text-gray-900 mb-4 text-lg">Select Dataset</h3>
+                        <div class="flex flex-wrap gap-3 mb-4">
+                            <button id="dataset1" class="dataset-btn btn-active px-4 py-2 rounded-sm transition-colors" data-dataset="Human3.6M">Human3.6M</button>
+                            <button id="dataset2" class="dataset-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-dataset="AMASS">AMASS</button>
+                            <button id="dataset3" class="dataset-btn btn-inactive px-4 py-2 rounded-sm transition-colors" data-dataset="CMU">CMU Mocap</button>
+                        </div>
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-info-circle mr-1 text-accent"></i> 
+                            Choose the dataset to visualize prediction results
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="flex justify-center gap-4 mb-8">
+                    <button id="renderBtn" class="bg-accent text-white px-6 py-3 rounded-sm hover:bg-blue-700 transition-colors flex items-center">
+                        <i class="fas fa-play mr-2"></i> Render Visualization
+                    </button>
+                    <button id="resetBtn" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-sm hover:bg-gray-300 transition-colors flex items-center">
+                        <i class="fas fa-refresh mr-2"></i> Reset
+                    </button>
+                </div>
+                
+                <!-- 可视化结果区域 -->
+                <div id="visualizationArea" class="visualization-container border border-gray-200 rounded-sm overflow-hidden">
+                    <!-- 初始状态：加载提示 -->
+                    <div id="loadingState" class="hidden w-full aspect-video bg-gray-50 flex flex-col items-center justify-center">
+                        <div class="loader w-16 h-16 border-4 border-gray-200 rounded-full mb-4"></div>
+                        <p class="text-gray-700">Rendering visualization... Please wait.</p>
+                    </div>
+                    
+                    <!-- 可视化内容 -->
+                    <div id="resultVisualization" class="w-full aspect-video bg-gray-100 relative">
+                        <!-- 默认可视化内容 -->
+                        <img 
+                            src="https://via.placeholder.com/1280x720/eeeeee/666666?text=STCNet+on+Human3.6M+Dataset" 
+                            alt="Default Visualization" 
+                            class="w-full h-full object-cover"
+                        >
+                        <!-- 信息叠加层 -->
+                        <div class="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-sm text-sm">
+                            Current: STCNet | Human3.6M
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 结果指标 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                    <div class="bg-gray-50 p-4 rounded-sm">
+                        <h4 class="font-medium text-gray-900 mb-2">MPJPE (mm)</h4>
+                        <p id="mpjpeValue" class="text-2xl font-bold text-accent">45.2</p>
+                        <p class="text-sm text-gray-600">Lower is better</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-sm">
+                        <h4 class="font-medium text-gray-900 mb-2">Accuracy (%)</h4>
+                        <p id="accuracyValue" class="text-2xl font-bold text-accent">92.8</p>
+                        <p class="text-sm text-gray-600">Higher is better</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-sm">
+                        <h4 class="font-medium text-gray-900 mb-2">Inference Time (ms)</h4>
+                        <p id="inferenceValue" class="text-2xl font-bold text-accent">18.7</p>
+                        <p class="text-sm text-gray-600">Lower is better</p>
+                    </div>
+                </div>
+                
+                <!-- 说明文本 -->
+                <div class="mt-8 text-gray-700">
+                    <h3 class="font-medium text-gray-900 mb-2">Visualization Explanation</h3>
+                    <p class="text-sm leading-relaxed">
+                        The visualization shows the predicted human motion sequences (red) compared with ground truth (blue) over 200ms time window. 
+                        The metrics on the bottom represent the key performance indicators for the selected model on the chosen dataset:
+                    </p>
+                    <ul class="text-sm text-gray-700 mt-2 pl-5 list-disc">
+                        <li><strong>MPJPE</strong>: Mean Per Joint Position Error (lower values indicate more accurate predictions)</li>
+                        <li><strong>Accuracy</strong>: Motion classification accuracy for action recognition tasks</li>
+                        <li><strong>Inference Time</strong>: Model inference latency per frame (real-time performance)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 页脚 -->
+            <div class="text-sm text-gray-600 flex flex-wrap gap-4 pt-4 border-t border-gray-200">
+                <p>&copy; 2024 Anonymous Research Team - <a href="license.html" class="text-blue-600 hover:underline">Privacy Policy</a> - <a href="license.html" class="text-blue-600 hover:underline">License</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript 交互逻辑 -->
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-sm');
+            } else {
+                navbar.classList.remove('shadow-sm');
+            }
+        });
+
+        // 全局变量存储当前选择
+        let currentModel = "STCNet";
+        let currentDataset = "Human3.6M";
+        
+        // 模拟的模型-数据集对应指标数据
+        const performanceData = {
+            "STCNet": {
+                "Human3.6M": { mpjpe: 45.2, accuracy: 92.8, inference: 18.7 },
+                "AMASS": { mpjpe: 48.5, accuracy: 91.2, inference: 19.3 },
+                "CMU": { mpjpe: 51.8, accuracy: 89.7, inference: 20.1 }
+            },
+            "Transformer": {
+                "Human3.6M": { mpjpe: 52.7, accuracy: 88.9, inference: 45.6 },
+                "AMASS": { mpjpe: 55.3, accuracy: 87.4, inference: 47.2 },
+                "CMU": { mpjpe: 58.9, accuracy: 86.1, inference: 48.8 }
+            },
+            "LSTM": {
+                "Human3.6M": { mpjpe: 61.4, accuracy: 85.3, inference: 12.4 },
+                "AMASS": { mpjpe: 64.8, accuracy: 83.7, inference: 13.1 },
+                "CMU": { mpjpe: 67.2, accuracy: 82.1, inference: 13.8 }
+            },
+            "GRU": {
+                "Human3.6M": { mpjpe: 58.9, accuracy: 87.6, inference: 14.2 },
+                "AMASS": { mpjpe: 61.5, accuracy: 86.2, inference: 14.9 },
+                "CMU": { mpjpe: 64.1, accuracy: 84.8, inference: 15.6 }
+            }
+        };
+
+        // 模型按钮点击事件
+        document.querySelectorAll('.model-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 重置所有模型按钮样式
+                document.querySelectorAll('.model-btn').forEach(b => {
+                    b.classList.remove('btn-active');
+                    b.classList.add('btn-inactive');
+                });
+                // 设置当前按钮为激活状态
+                this.classList.remove('btn-inactive');
+                this.classList.add('btn-active');
+                // 更新当前模型
+                currentModel = this.dataset.model;
+                // 更新信息文本
+                updateInfoOverlay();
+            });
+        });
+
+        // 数据集按钮点击事件
+        document.querySelectorAll('.dataset-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 重置所有数据集按钮样式
+                document.querySelectorAll('.dataset-btn').forEach(b => {
+                    b.classList.remove('btn-active');
+                    b.classList.add('btn-inactive');
+                });
+                // 设置当前按钮为激活状态
+                this.classList.remove('btn-inactive');
+                this.classList.add('btn-active');
+                // 更新当前数据集
+                currentDataset = this.dataset.dataset;
+                // 更新信息文本
+                updateInfoOverlay();
+            });
+        });
+
+        // 渲染按钮点击事件
+        document.getElementById('renderBtn').addEventListener('click', function() {
+            // 显示加载状态
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('resultVisualization').classList.add('hidden');
+            
+            // 模拟加载延迟 (2秒)
+            setTimeout(() => {
+                // 隐藏加载状态
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('resultVisualization').classList.remove('hidden');
+                
+                // 更新可视化图片
+                updateVisualizationImage();
+                // 更新性能指标
+                updatePerformanceMetrics();
+                
+                // 添加轻微的动画效果
+                const container = document.getElementById('visualizationArea');
+                container.style.opacity = 0;
+                setTimeout(() => {
+                    container.style.opacity = 1;
+                }, 50);
+            }, 2000);
+        });
+
+        // 重置按钮点击事件
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            // 重置模型选择
+            document.querySelectorAll('.model-btn').forEach(btn => {
+                btn.classList.remove('btn-active');
+                btn.classList.add('btn-inactive');
+            });
+            document.getElementById('model1').classList.remove('btn-inactive');
+            document.getElementById('model1').classList.add('btn-active');
+            currentModel = "STCNet";
+            
+            // 重置数据集选择
+            document.querySelectorAll('.dataset-btn').forEach(btn => {
+                btn.classList.remove('btn-active');
+                btn.classList.add('btn-inactive');
+            });
+            document.getElementById('dataset1').classList.remove('btn-inactive');
+            document.getElementById('dataset1').classList.add('btn-active');
+            currentDataset = "Human3.6M";
+            
+            // 重置可视化和指标
+            updateInfoOverlay();
+            updateVisualizationImage();
+            updatePerformanceMetrics();
+        });
+
+        // 更新信息叠加层
+        function updateInfoOverlay() {
+            const overlay = document.querySelector('#resultVisualization .absolute');
+            overlay.textContent = `Current: ${currentModel} | ${currentDataset}`;
+        }
+
+        // 更新可视化图片 (模拟不同组合的图片)
+        function updateVisualizationImage() {
+            const img = document.querySelector('#resultVisualization img');
+            const placeholderText = `${currentModel} on ${currentDataset} Dataset`;
+            img.src = `https://via.placeholder.com/1280x720/eeeeee/666666?text=${encodeURIComponent(placeholderText)}`;
+            img.alt = placeholderText;
+        }
+
+        // 更新性能指标
+        function updatePerformanceMetrics() {
+            const data = performanceData[currentModel][currentDataset];
+            document.getElementById('mpjpeValue').textContent = data.mpjpe;
+            document.getElementById('accuracyValue').textContent = data.accuracy;
+            document.getElementById('inferenceValue').textContent = data.inference;
+        }
+    </script>
+</body>
+</html>
